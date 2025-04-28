@@ -1,3 +1,10 @@
+# Hide Streamlit deprecation warnings
+st.set_option('deprecation.showPyplotGlobalUse', False)
+st.set_option('deprecation.showfileUploaderEncoding', False)
+st.set_option('deprecation.showContainerWidth', False)
+
+
+
 # streamlit_app.py — launch with: streamlit run streamlit_app.py
 
 import streamlit as st
