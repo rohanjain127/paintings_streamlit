@@ -1,14 +1,16 @@
 # streamlit_app.py  ── launch with:  streamlit run streamlit_app.py
 import streamlit as st
-import psycopg2, pandas as pd, plotly.express as px
+import psycopg2
+import pandas as pd
+import plotly.express as px
 
-# ── DB credentials ─────────────────────────────────────────────────────
+# ── DB credentials (using Streamlit secrets) ─────────────────────────────
 DB = dict(
-    host="localhost",
-    dbname="paintings_submission",
-    user="postgres",
-    password="Asodit7878@95",
-    port=5432,
+    host     = st.secrets["DB_HOST"],
+    dbname   = st.secrets["DB_NAME"],
+    user     = st.secrets["DB_USER"],
+    password = st.secrets["DB_PASSWORD"],
+    port     = st.secrets.get("DB_PORT", 5432),
 )
 
 @st.cache_data(show_spinner=False)
@@ -17,13 +19,13 @@ def run_query(sql_text, params=None):
     with psycopg2.connect(**DB) as conn:
         return pd.read_sql_query(sql_text, conn, params=params)
 
-# ── UI ─────────────────────────────────────────────────────────────────
+# ── UI ───────────────────────────────────────────────────────────────────
 st.title("🎨 Paintings Database Explorer")
 
 page = st.sidebar.selectbox(
     "Select a page",
     (
-        "SQL Playground",      # moved to top
+        "SQL Playground",    # 👈 move SQL Playground first
         "Artists",
         "Museums",
         "Works by Style",
@@ -31,9 +33,9 @@ page = st.sidebar.selectbox(
     ),
 )
 
-# 1 ── SQL Playground  (SELECT-only queries)
+# 1 ── SQL Playground (read-only SELECTs)
 if page == "SQL Playground":
-    st.subheader("🛠  Ad-hoc SQL Playground (SELECT-only)")
+    st.subheader("🛠 Ad-hoc SQL Playground (SELECT-only)")
 
     default = "SELECT * FROM artist LIMIT 10;"
     user_sql = st.text_area("Enter a SELECT statement:", default, height=160)
@@ -48,10 +50,10 @@ if page == "SQL Playground":
                 if df.empty:
                     st.info("Query ran, but returned zero rows.")
                 else:
-                    st.success(f"✅ Returned {len(df)} rows.")
+                    st.success(f"Returned {len(df)} rows.")
                     st.dataframe(df)
 
-                    # optional scatter plot
+                    # quick numeric scatter if ≥2 numeric columns
                     nums = df.select_dtypes("number")
                     if nums.shape[1] >= 2:
                         x, y = nums.columns[:2]
@@ -60,7 +62,7 @@ if page == "SQL Playground":
                             use_container_width=True,
                         )
             except Exception as e:
-                st.error(f"❌ Query failed: {e}")
+                st.error(f"Query failed: {e}")
 
 # 2 ── Artists table
 elif page == "Artists":
@@ -70,7 +72,7 @@ elif page == "Artists":
         FROM   artist
         ORDER  BY last_name
     """)
-    st.subheader(f"🧑‍🎨 Artists — {len(df)} rows")
+    st.subheader(f"👨‍🎨 Artists ({len(df)} rows)")
     st.dataframe(df)
 
 # 3 ── Museums (+ location)
@@ -83,7 +85,7 @@ elif page == "Museums":
         LEFT JOIN postalcode pc USING (postal)
         ORDER  BY country, state, city
     """)
-    st.subheader(f"🏛 Museums — {len(df)} rows")
+    st.subheader(f"🏛 Museums ({len(df)} rows)")
     st.dataframe(df.set_index("museum_id"))
 
 # 4 ── Top 20 styles (bar chart)
@@ -96,7 +98,7 @@ elif page == "Works by Style":
         ORDER  BY works DESC
         LIMIT  20
     """)
-    st.subheader(f"🎨 Top 20 Styles — {len(df)} rows")
+    st.subheader(f"🎨 Top 20 Styles ({len(df)} styles)")
     fig = px.bar(df, x="style", y="works", title="Top 20 Styles")
     st.plotly_chart(fig, use_container_width=True)
 
@@ -111,7 +113,7 @@ elif page == "Price-vs-Size":
         JOIN   work         w  USING (work_id)
         WHERE  ps.sale_price IS NOT NULL
     """)
-    st.subheader(f"🖼 Price vs Canvas Area — {len(df)} rows")
+    st.subheader(f"🖼 Price vs Size ({len(df)} rows)")
     fig = px.scatter(
         df,
         x="area",
