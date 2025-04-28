@@ -1,10 +1,11 @@
-# streamlit_app.py  ── launch with:  streamlit run streamlit_app.py
+# streamlit_app.py — launch with: streamlit run streamlit_app.py
+
 import streamlit as st
 import psycopg2
 import pandas as pd
 import plotly.express as px
 
-# ── DB credentials (using Streamlit secrets) ─────────────────────────────
+# ── DB credentials from secrets ──
 DB = dict(
     host     = st.secrets["DB_HOST"],
     dbname   = st.secrets["DB_NAME"],
@@ -13,37 +14,68 @@ DB = dict(
     port     = st.secrets.get("DB_PORT", 5432),
 )
 
+# ── Query Helper ──
 @st.cache_data(show_spinner=False)
 def run_query(sql_text, params=None):
-    """Return a DataFrame for the given SELECT statement."""
     with psycopg2.connect(**DB) as conn:
         return pd.read_sql_query(sql_text, conn, params=params)
 
-# ── UI ───────────────────────────────────────────────────────────────────
-st.title("🎨 Paintings Database Explorer")
-
-page = st.sidebar.selectbox(
-    "Select a page",
-    (
-        "SQL Playground",    # 👈 move SQL Playground first
-        "Artists",
-        "Museums",
-        "Works by Style",
-        "Price-vs-Size",
-    ),
+# ── Add background image (Starry Night) ──
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg');
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+    }
+    .block-container {
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 2rem;
+        border-radius: 10px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
 )
 
-# 1 ── SQL Playground (read-only SELECTs)
+# ── UI Header ──
+st.title("🎨 Paintings Database Explorer")
+
+# ── Sidebar navigation ──
+page_options = ["SQL Playground"]
+
+# Add table names dynamically
+tables = run_query("""
+    SELECT relname AS table_name, n_live_tup AS row_count
+    FROM pg_stat_user_tables
+    ORDER BY table_name
+""")
+for _, row in tables.iterrows():
+    page_options.append(f"{row['table_name']} ({row['row_count']} rows)")
+
+# Add custom dashboards
+page_options += [
+    "Top Nationalities",
+    "Price Distribution",
+    "Top Museums by Artworks"
+]
+
+page = st.sidebar.selectbox("Select a page", page_options)
+
+# ── Logic per page ──
+
+# 1 ── SQL Playground
 if page == "SQL Playground":
     st.subheader("🛠 Ad-hoc SQL Playground (SELECT-only)")
-
     default = "SELECT * FROM artist LIMIT 10;"
     user_sql = st.text_area("Enter a SELECT statement:", default, height=160)
 
     if st.button("Run query"):
         sql_lower = user_sql.strip().lower()
         if not sql_lower.startswith("select"):
-            st.warning("Only **SELECT** statements are allowed.")
+            st.warning("Only SELECT statements are allowed.")
         else:
             try:
                 df = run_query(user_sql)
@@ -52,8 +84,7 @@ if page == "SQL Playground":
                 else:
                     st.success(f"Returned {len(df)} rows.")
                     st.dataframe(df)
-
-                    # quick numeric scatter if ≥2 numeric columns
+                    
                     nums = df.select_dtypes("number")
                     if nums.shape[1] >= 2:
                         x, y = nums.columns[:2]
@@ -64,62 +95,49 @@ if page == "SQL Playground":
             except Exception as e:
                 st.error(f"Query failed: {e}")
 
-# 2 ── Artists table
-elif page == "Artists":
-    df = run_query("""
-        SELECT artist_id, last_name, first_name,
-               nationality, style, birth, death
-        FROM   artist
-        ORDER  BY last_name
-    """)
-    st.subheader(f"👨‍🎨 Artists ({len(df)} rows)")
+# 2 ── Table Viewer
+elif "(" in page and ")" in page:
+    table_name = page.split(" (")[0]
+    st.subheader(f"📄 Table: `{table_name}`")
+    df = run_query(f"SELECT * FROM {table_name}")
     st.dataframe(df)
+    st.success(f"Total rows: {len(df)}")
 
-# 3 ── Museums (+ location)
-elif page == "Museums":
+# 3 ── Top Nationalities
+elif page == "Top Nationalities":
+    st.subheader("🌍 Top 10 Nationalities by Artworks")
     df = run_query("""
-        SELECT m.museum_id, m.name,
-               pc.city, pc.state, pc.country,
-               m.url
-        FROM   museum m
-        LEFT JOIN postalcode pc USING (postal)
-        ORDER  BY country, state, city
+        SELECT nationality, COUNT(*) AS count
+        FROM artist
+        WHERE nationality IS NOT NULL
+        GROUP BY nationality
+        ORDER BY count DESC
+        LIMIT 10
     """)
-    st.subheader(f"🏛 Museums ({len(df)} rows)")
-    st.dataframe(df.set_index("museum_id"))
-
-# 4 ── Top 20 styles (bar chart)
-elif page == "Works by Style":
-    df = run_query("""
-        SELECT style, COUNT(*) AS works
-        FROM   work
-        WHERE  style IS NOT NULL
-        GROUP  BY style
-        ORDER  BY works DESC
-        LIMIT  20
-    """)
-    st.subheader(f"🎨 Top 20 Styles ({len(df)} styles)")
-    fig = px.bar(df, x="style", y="works", title="Top 20 Styles")
+    fig = px.bar(df, x="nationality", y="count", title="Top 10 Nationalities")
     st.plotly_chart(fig, use_container_width=True)
 
-# 5 ── Price vs canvas area (scatter)
-elif page == "Price-vs-Size":
+# 4 ── Price Distribution
+elif page == "Price Distribution":
+    st.subheader("💵 Sale Price Distribution")
     df = run_query("""
-        SELECT cs.width * cs.height AS area,
-               ps.sale_price,
-               w.style
-        FROM   product_size ps
-        JOIN   canvas_size cs USING (size_id)
-        JOIN   work         w  USING (work_id)
-        WHERE  ps.sale_price IS NOT NULL
+        SELECT sale_price
+        FROM product_size
+        WHERE sale_price IS NOT NULL
     """)
-    st.subheader(f"🖼 Price vs Size ({len(df)} rows)")
-    fig = px.scatter(
-        df,
-        x="area",
-        y="sale_price",
-        color="style",
-        labels=dict(area="Canvas area (width × height)", sale_price="Sale price"),
-        height=600,
-    )
+    fig = px.histogram(df, x="sale_price", nbins=30, title="Sale Price Distribution")
+    st.plotly_chart(fig, use_container_width=True)
+
+# 5 ── Top Museums by Artworks
+elif page == "Top Museums by Artworks":
+    st.subheader("🏛 Top Museums by Artwork Count")
+    df = run_query("""
+        SELECT m.name, COUNT(*) AS count
+        FROM museum m
+        JOIN work w ON m.museum_id = w.museum_id
+        GROUP BY m.name
+        ORDER BY count DESC
+        LIMIT 10
+    """)
+    fig = px.bar(df, x="count", y="name", orientation="h", title="Top Museums")
     st.plotly_chart(fig, use_container_width=True)
