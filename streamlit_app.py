@@ -25,72 +25,36 @@ st.set_page_config(page_title="Paintings Explorer", layout="wide")
 # ── Background Image ──────────────────────────────────────────────────────
 page_bg_img = """
 <style>
-/* Set background image */
+/* Background of entire app */
 [data-testid="stAppViewContainer"] {
-    background: url("https://upload.wikimedia.org/wikipedia/commons/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg");
+    background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/800px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-/* Transparent main header */
+/* Make header transparent */
 [data-testid="stHeader"] {
-    background: rgba(255,255,255,0.1);
+    background: rgba(0, 0, 0, 0);
 }
 
-/* Sidebar background darker */
+/* Darken sidebar */
 [data-testid="stSidebar"] {
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.85); /* Almost black */
 }
 
-/* Sidebar text */
+/* Text color inside sidebar */
 [data-testid="stSidebar"] * {
-    color: #ffffff;
-    font-weight: bold;
+    color: #f0f0f0; /* Light text for sidebar elements */
 }
 
-/* Dropdown select text inside sidebar */
-[data-baseweb="select"] > div {
-    color: #ffffff !important;
-}
-
-/* Text inside TextArea and TextInput */
-textarea, input {
-    background-color: rgba(255,255,255,0.8) !important;
-    color: #000000 !important;
-    font-weight: bold;
-}
-
-/* Buttons */
-button[kind="secondary"] > div {
-    color: #000000 !important;
-    font-weight: bold;
-}
-
-/* Overall app text */
+/* Main page text */
 h1, h2, h3, h4, h5, h6, p, label, div, span, th, td {
-    color: #ffffff;
-}
-
-/* Make button backgrounds slightly lighter */
-button {
-    background-color: rgba(255,255,255,0.85) !important;
-    color: black !important;
-}
-
-/* Table headers */
-thead th {
-    background-color: rgba(0, 0, 50, 0.8);
-    color: #ffffff;
-}
-
-/* DataFrame table rows */
-tbody td {
-    background-color: rgba(0,0,0,0.5);
-    color: #ffffff;
+    color: #ffffff; /* Pure white text */
 }
 </style>
 """
+
 
 
 
