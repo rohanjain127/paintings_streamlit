@@ -1,18 +1,26 @@
-# Hide Streamlit deprecation warnings
-st.set_option('deprecation.showPyplotGlobalUse', False)
-st.set_option('deprecation.showfileUploaderEncoding', False)
-st.set_option('deprecation.showContainerWidth', False)
-
-
-
-# streamlit_app.py — launch with: streamlit run streamlit_app.py
+# streamlit_app.py  ── launch with:  streamlit run streamlit_app.py
 
 import streamlit as st
 import psycopg2
 import pandas as pd
 import plotly.express as px
 
-# ── DB credentials (using Streamlit secrets) ─────────────────────────────
+# ── Hide deprecation warnings ──
+st.set_option('deprecation.showPyplotGlobalUse', False)
+st.set_option('deprecation.showfileUploaderEncoding', False)
+st.set_option('deprecation.showContainerWidth', False)
+
+# ── Title ─────────────────────────────────────
+st.title("🎨 Paintings Database Explorer")
+
+# ── Add Starry Night image below title ─────────
+st.image(
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/640px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+    caption="Van Gogh - The Starry Night",
+    use_column_width=True
+)
+
+# ── DB credentials (using Streamlit secrets) ──
 DB = dict(
     host     = st.secrets["DB_HOST"],
     dbname   = st.secrets["DB_NAME"],
@@ -23,21 +31,11 @@ DB = dict(
 
 @st.cache_data(show_spinner=False)
 def run_query(sql_text, params=None):
-    """Return a DataFrame for the given SELECT statement."""
+    """Run a SQL query and return a DataFrame."""
     with psycopg2.connect(**DB) as conn:
         return pd.read_sql_query(sql_text, conn, params=params)
 
-# ── UI ───────────────────────────────────────────────────────────────────
-st.title("🎨 Paintings Database Explorer")
-
-# 🎨 Add Starry Night image below the title
-st.image(
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/320px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
-    width=300,
-    caption="Van Gogh - The Starry Night",
-    use_column_width=False,
-)
-
+# ── Sidebar dropdown ───────────────────────────
 page = st.sidebar.selectbox(
     "Select a page",
     (
@@ -47,7 +45,9 @@ page = st.sidebar.selectbox(
     ),
 )
 
-# 1 ── SQL Playground + Tables
+# ── Page content ───────────────────────────────
+
+# 1 ─ SQL Playground + Tables
 if page == "🛠 SQL Playground + Tables":
     st.subheader("🛠 Ad-hoc SQL Playground (SELECT-only)")
 
@@ -67,21 +67,19 @@ if page == "🛠 SQL Playground + Tables":
                     st.success(f"Returned {len(df)} rows.")
                     st.dataframe(df)
 
-                    # quick numeric scatter if ≥2 numeric cols
+                    # quick scatter if ≥2 numeric cols
                     nums = df.select_dtypes("number")
                     if nums.shape[1] >= 2:
                         x, y = nums.columns[:2]
-                        st.plotly_chart(
-                            px.scatter(df, x=x, y=y, title=f"{x} vs {y}"),
-                            use_container_width=True,
-                        )
+                        fig = px.scatter(df, x=x, y=y, title=f"{x} vs {y}")
+                        st.plotly_chart(fig, use_container_width=True)
             except Exception as e:
                 st.error(f"Query failed: {e}")
 
     # Divider
     st.divider()
 
-    # Show all tables + their counts
+    # All tables and row counts
     st.subheader("📋 All Tables and Row Counts")
 
     try:
@@ -94,7 +92,7 @@ if page == "🛠 SQL Playground + Tables":
     except Exception as e:
         st.error(f"Failed to fetch table counts: {e}")
 
-# 2 ── Top 20 Styles
+# 2 ─ Top 20 Styles
 elif page == "🎨 Top 20 Styles":
     st.subheader("🎨 Top 20 Painting Styles")
 
@@ -109,7 +107,7 @@ elif page == "🎨 Top 20 Styles":
     fig = px.bar(df, x="style", y="works", title="Top 20 Styles")
     st.plotly_chart(fig, use_container_width=True)
 
-# 3 ── Price vs Size
+# 3 ─ Price vs Size
 elif page == "🖼 Price vs Size":
     st.subheader("🖼 Price vs Canvas Area")
 
