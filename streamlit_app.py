@@ -5,11 +5,19 @@ import psycopg2
 import pandas as pd
 import plotly.express as px
 
-# ── Set Starry Night background ─────────────────────────────────────────
-st.image(
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/640px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg",
-    use_column_width=True
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/640px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg");
+        background-size: cover;
+        background-position: center;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
+
 
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
