@@ -9,13 +9,23 @@ import plotly.express as px
 page_bg_img = """
 <style>
 [data-testid="stAppViewContainer"] {
-    background: url("https://upload.wikimedia.org/wikipedia/commons/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg");
+    background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/800px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
+[data-testid="stHeader"] {
+    background: rgba(0, 0, 0, 0);
+}
+[data-testid="stSidebar"] {
+    background: rgba(0, 0, 0, 0.7);
+}
+h1, h2, h3, h4, h5, h6, p, label, div {
+    color: #f0f0f0;
+}
 </style>
 """
+
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
 # ── DB credentials (using Streamlit secrets) ─────────────────────────────
