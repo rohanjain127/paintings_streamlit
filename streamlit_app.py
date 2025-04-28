@@ -1,4 +1,4 @@
-# streamlit_app.py  ── launch with:  streamlit run streamlit_app.py
+# streamlit_app.py — launch with: streamlit run streamlit_app.py
 
 import streamlit as st
 import psycopg2
@@ -22,6 +22,14 @@ def run_query(sql_text, params=None):
 
 # ── UI ───────────────────────────────────────────────────────────────────
 st.title("🎨 Paintings Database Explorer")
+
+# 🎨 Add Starry Night image below the title
+st.image(
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/320px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg",
+    width=300,
+    caption="Van Gogh - The Starry Night",
+    use_column_width=False,
+)
 
 page = st.sidebar.selectbox(
     "Select a page",
