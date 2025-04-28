@@ -9,7 +9,7 @@ import plotly.express as px
 page_bg_img = """
 <style>
 [data-testid="stAppViewContainer"] {
-    background: url("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/640px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg");
+    background: url("https://en.wikipedia.org/wiki/Wanderer_above_the_Sea_of_Fog#/media/File:Caspar_David_Friedrich_-_Wanderer_above_the_Sea_of_Fog.jpeg");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
