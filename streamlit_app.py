@@ -26,7 +26,7 @@ st.set_page_config(page_title="Paintings Explorer", layout="wide")
 page_bg_img = """
 <style>
 [data-testid="stAppViewContainer"] {
-    background-image: url("https://upload.wikimedia.org/wikipedia/commons/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg");
+    background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/800px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -42,6 +42,7 @@ h1, h2, h3, h4, h5, h6, p, label, div {
 }
 </style>
 """
+
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
 # ── UI ───────────────────────────────────────────────────────────────────
