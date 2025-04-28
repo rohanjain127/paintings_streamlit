@@ -9,13 +9,15 @@ import plotly.express as px
 page_bg_img = """
 <style>
 [data-testid="stAppViewContainer"] {
-    background: url("https://upload.wikimedia.org/wikipedia/commons/0/04/Claude_Monet_-_Water_Lilies_-_1906%2C_Mus%C3%A9e_Marmottan_Monet.jpg");
+    background: url("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/640px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 </style>
 """
+st.markdown(page_bg_img, unsafe_allow_html=True)
+
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
 
