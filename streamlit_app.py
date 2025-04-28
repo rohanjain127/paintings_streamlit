@@ -5,27 +5,6 @@ import psycopg2
 import pandas as pd
 import plotly.express as px
 
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/640px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg");
-        background-size: cover;
-        background-position: center;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-st.markdown(page_bg_img, unsafe_allow_html=True)
-
-st.markdown(page_bg_img, unsafe_allow_html=True)
-
-
-st.markdown(page_bg_img, unsafe_allow_html=True)
-
 # ── DB credentials (using Streamlit secrets) ─────────────────────────────
 DB = dict(
     host     = st.secrets["DB_HOST"],
@@ -72,7 +51,7 @@ if page == "🛠 SQL Playground + Tables":
                 else:
                     st.success(f"Returned {len(df)} rows.")
                     st.dataframe(df)
-                    
+
                     # quick numeric scatter if ≥2 numeric cols
                     nums = df.select_dtypes("number")
                     if nums.shape[1] >= 2:
