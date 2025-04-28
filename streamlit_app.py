@@ -6,16 +6,11 @@ import pandas as pd
 import plotly.express as px
 
 # ── Set Starry Night background ─────────────────────────────────────────
-page_bg_img = """
-<style>
-[data-testid="stAppViewContainer"] {
-    background: url("https://en.wikipedia.org/wiki/Wanderer_above_the_Sea_of_Fog#/media/File:Caspar_David_Friedrich_-_Wanderer_above_the_Sea_of_Fog.jpeg");
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-}
-</style>
-"""
+st.image(
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg/640px-Caspar_David_Friedrich_-_Wanderer_above_the_sea_of_fog.jpg",
+    use_column_width=True
+)
+
 st.markdown(page_bg_img, unsafe_allow_html=True)
 
 st.markdown(page_bg_img, unsafe_allow_html=True)
