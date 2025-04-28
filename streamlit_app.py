@@ -25,23 +25,52 @@ st.set_page_config(page_title="Paintings Explorer", layout="wide")
 # ── Background Image ──────────────────────────────────────────────────────
 page_bg_img = """
 <style>
+/* Background of entire app */
 [data-testid="stAppViewContainer"] {
     background-image: url("https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/800px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
+
+/* Transparent header */
 [data-testid="stHeader"] {
-    background: rgba(0, 0, 0, 0);
+    background: rgba(0,0,0,0);
 }
+
+/* Sidebar background */
 [data-testid="stSidebar"] {
-    background: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0,0,0,0.85);
 }
-h1, h2, h3, h4, h5, h6, p, label, div {
+
+/* Sidebar texts */
+[data-testid="stSidebar"] * {
     color: #f0f0f0;
+}
+
+/* Fix dropdown text inside sidebar */
+[data-baseweb="select"] > div {
+    color: #f0f0f0;
+}
+
+/* Fix button text */
+button[kind="secondary"] > div {
+    color: #000000 !important; /* Make "Run Query" button text black */
+    font-weight: bold;
+}
+
+/* Fix text inputs / textarea text color */
+textarea, input, select {
+    color: #000000 !important; /* Black typing text */
+}
+
+/* General text on main page */
+h1, h2, h3, h4, h5, h6, p, label, div, span, th, td {
+    color: #ffffff;
 }
 </style>
 """
+
 
 
 st.markdown(page_bg_img, unsafe_allow_html=True)
